@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+    <style>
+        #BaseForm {
+            position: absolute;
+            background-color: rgb(198, 198, 255);
+            height: 600px;
+            width: 300px;
+            left: calc(50% - 150px);
+            top: calc(50% - 300px);
+            border-radius: 10px;
+            box-shadow: 0 0 10px 10px rgb(222, 222, 255);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="BaseForm">
+        <label for="" style="position: absolute; left: 10px; top: 10px;">Подключение у устройства.</label>
+        <input type="text" id="IP" style="position: absolute; top: 50px; left: 10px; height: 20px;" value="10.1.3.250">
+        <input type="text" id="PORT" style="position: absolute; top: 80px; left: 10px; height: 20px;" value="40005">
+        <input type="text" id="ADDRES" style="position: absolute; top: 110px; left: 10px; height: 20px;" value="1">
+        <button id="Conntet" style="position: absolute; top: 140px; left: 10px; height: 30px;"
+            value="1">Подключение</button>
+        <input type="text" id="Zone" style="position: absolute; top: 180px; left: 10px; height: 20px;" value="6">
+        <button id="ARM" style="position: absolute; top: 210px; left: 10px; height: 30px;" value="1">ARM</button>
+        <button id="lili" onclick="DISARMs()" style="position: absolute; top: 210px; left: 60px; height: 30px;" value="1">DISARM</button>
+        <button id="STate" style="position: absolute; top: 210px; left: 140px; height: 30px;" value="1">STate</button>
+    </div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const button = document.getElementById("Conntet");
+            button.addEventListener("click", ConnectDevice);
+            const ARMb = document.getElementById("ARM");
+            ARMb.addEventListener("click", ARM);
+        });
+
+        function ConnectDevice() {
+            const button = document.getElementById("Conntet");
+            button.textContent = "жДИ..";
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                var Conntet = document.getElementById("Conntet");
+                Conntet.textContent = xhr.response;
+            };
+            xhr.open("POST", document.URL);
+            var getip = document.getElementById("IP");
+            var getport = document.getElementById("PORT");
+            var getaddres = document.getElementById("ADDRES");
+            xhr.send("initDeviceInteraction " + getip.value + " " + getport.value + " " + getaddres.value + " 9600")
+
+        }
+
+
+        function ARM() {
+
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                var ARM = document.getElementById("ARM");
+                if (xhr.response == "True") {
+                    ARM.style.backgroundColor = "Green";
+                }
+            };
+            xhr.open("POST", document.URL);
+            var Zone = document.getElementById("Zone");
+            xhr.send("SetZoneStateCommand " + Zone.value + " 24")
+        }
+
+        function DISARMs() {
+
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                var DISARM = document.getElementById("lili");
+                if (xhr.response == "True") {
+                    DISARM.style.backgroundColor = "Blue";
+                }
+            };
+            xhr.open("POST", document.URL);
+            var Zone = document.getElementById("Zone");
+            xhr.send("SetZoneStateCommand " + Zone.value + " 109")
+        }
+    </script>
+</body>
+
+</html>

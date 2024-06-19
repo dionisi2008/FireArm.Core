@@ -1,0 +1,4 @@
+{
+    "dotnet.defaultSolution": "C2000-PP.sln",
+    "cmake.configureOnOpen": false
+}
