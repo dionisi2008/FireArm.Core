@@ -9,6 +9,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Threading.Tasks.Dataflow;
 using System.Dynamic;
+using System.Net.Sockets;
 
 namespace C2000_PP
 {
@@ -26,19 +27,19 @@ namespace C2000_PP
 
             while (WebObjectApi.IsListening)
             {
-                var Context = WebObjectApi.GetContext();
+                var Context = WebObjectApi.GetContextAsync().Result;
                 WorkerContext(Context);
                 Context.Response.Close();
             }
 
         }
 
-        public void WorkerContext(HttpListenerContext GetContext)
+        public async void WorkerContext(HttpListenerContext GetContext)
         {
             if (GetContext.Request.IsWebSocketRequest == true)
             {
-                var tim = GetContext.AcceptWebSocketAsync("").Result;
-                
+                var tim = await GetContext.AcceptWebSocketAsync("test");
+                WorkerWS(tim.WebSocket);
             }
             else
             {
@@ -60,6 +61,14 @@ namespace C2000_PP
             }
 
 
+        }
+
+        public async void WorkerWS(System.Net.WebSockets.WebSocket GetWS)
+        {
+            ArraySegment<byte> ReadDataByte = new ArraySegment<byte>();
+            GetWS.ReceiveAsync(ReadDataByte, CancellationToken.None).Wait();
+            List<string> RequestServer = new List<string>(Encoding.UTF8.GetString(ReadDataByte.ToArray()).Split('\n'));
+            Console.WriteLine(string.Join('\n', RequestServer.ToArray()));
         }
         public void DisplaySystemState(HttpListenerContext GetContext)
         {
